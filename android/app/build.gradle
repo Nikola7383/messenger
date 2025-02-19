@@ -1,0 +1,72 @@
+android {
+    ...
+
+    flavorDimensions "role"
+    productFlavors {
+        regular {
+            dimension "role"
+            applicationIdSuffix ".regular"
+            versionNameSuffix "-regular"
+            buildConfigField "String", "APP_TYPE", "\"regular\""
+            buildConfigField "boolean", "ENABLE_MESH", "false"
+            buildConfigField "boolean", "ENABLE_ADMIN", "false"
+            buildConfigField "int", "SECURITY_LEVEL", "1"
+        }
+        network {
+            dimension "role"
+            applicationIdSuffix ".network"
+            versionNameSuffix "-network"
+            buildConfigField "String", "APP_TYPE", "\"network\""
+            buildConfigField "boolean", "ENABLE_MESH", "true"
+            buildConfigField "boolean", "ENABLE_ADMIN", "true"
+            buildConfigField "int", "SECURITY_LEVEL", "2"
+        }
+        secret {
+            dimension "role"
+            applicationId "com.glasnik.secret"
+            versionNameSuffix "-secret"
+            buildConfigField "String", "APP_TYPE", "\"secret\""
+            buildConfigField "boolean", "ENABLE_MESH", "true"
+            buildConfigField "boolean", "ENABLE_ADMIN", "true"
+            buildConfigField "int", "SECURITY_LEVEL", "3"
+            buildConfigField "boolean", "ENABLE_ROOT_DETECTION", "true"
+            buildConfigField "boolean", "ENABLE_TAMPER_DETECTION", "true"
+            buildConfigField "boolean", "ENABLE_MEMORY_PROTECTION", "true"
+            buildConfigField "boolean", "ENABLE_PROCESS_MONITORING", "true"
+            
+            manifestPlaceholders = [
+                appName: "Calculator",
+                appIcon: "@mipmap/ic_launcher_calculator"
+            ]
+            
+            ndk {
+                abiFilters "armeabi-v7a", "arm64-v8a"
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            
+            productFlavors.network.proguardFile 'network-rules.pro'
+            productFlavors.secret.proguardFile 'secret-rules.pro'
+            
+            productFlavors.secret {
+                debuggable false
+                jniDebuggable false
+                renderscriptDebuggable false
+                signingConfig signingConfigs.release
+                
+                proguardFile 'secret-extra-rules.pro'
+            }
+        }
+    }
+    
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+} 
